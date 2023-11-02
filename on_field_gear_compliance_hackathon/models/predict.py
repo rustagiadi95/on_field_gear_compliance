@@ -32,7 +32,9 @@ def process_image(img, text) :
 
 
 
-def helmet_or_not(image) :
+def contrastive_reply(image, mode = 'helmet') :
+
+    assert mode in ['helmet', 'count_people'], 'mode should be either "helmet" or "count_people"'
 
     img=None
     if type(img) == str :
@@ -44,13 +46,13 @@ def helmet_or_not(image) :
     else : 
         img = image
     
-
-    questions = ["a person wearing helmet", "a person not wearing helmet"]
+    if mode == 'helmet' :
+        questions = ["a person wearing helmet", "a person not wearing helmet"]
+    elif mode == 'count_people' :
+        questions = ["more than 1 person", "1 person"]
 
     return process_image(img, questions)
 
-
-#["more than 1 person", "1 person"]
 
 
     
