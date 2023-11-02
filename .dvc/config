@@ -1,0 +1,7 @@
+[cache]
+    type = "reflink,copy"
+[core]
+    remote = origin
+    autostage = true
+['remote "origin"']
+    url = gs://fmt-ds-bucket/projects/on_field_gear_compliance_hackathon

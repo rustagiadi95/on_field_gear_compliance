@@ -1,0 +1,10 @@
+black
+dvc
+dvc[gs]
+flake8
+isort
+pip
+pre-commit
+python-dotenv
+setuptools
+wheel
