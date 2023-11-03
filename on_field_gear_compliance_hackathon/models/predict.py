@@ -1,5 +1,6 @@
 from transformers import CLIPModel, AutoProcessor
 from PIL import Image
+import numpy as np
 from on_field_gear_compliance_hackathon.constants import DATA_DIR
 from deepface import DeepFace
 import uuid
@@ -61,9 +62,9 @@ def contrastive_reply(image, mode = 'helmet') :
     img = get_image(image)
     
     if mode == 'helmet' :
-        questions = ["a person WEARING helmet", "a person NOT WEARING helmet"]
+        questions = ["a person wearing helmet", "a person not wearing helmet"]
     elif mode == 'count_people' :
-        questions = ["a photo with MORE THAN ONE person", "a photo with ONLY ONE person", "a photo with NO person"]
+        questions = ["a photo with more than 1 person", "a photo with 1 person", "a photo with no person"]
 
     return process_image(img, questions)
 
@@ -74,17 +75,28 @@ def add_face(image, name) :
     assert type(name) == str, 'name should be a string'
 
     img = get_image(image)
+    pil_img = Image.fromarray(np.uint8(img)).convert('RGB')
 
-    img.save(DATA_DIR, f'uploaded_images/{name}.jpeg')
+    pil_img.save(os.path.join(DATA_DIR, f'verified_images/{name}.jpeg'))
+
+    return "!!!Person added successfully!!!"
 
 
 def recognize(image) :
 
     img = get_image(image)
+    pil_img = Image.fromarray(np.uint8(img)).convert('RGB')
     path = os.path.join(DATA_DIR, f'raw_images/{uuid.uuid4().hex}.jpeg')
-    img.save(path)
+    pil_img.save(path)
 
-    recognition = DeepFace.find(path, verified_images)
+    recognition = DeepFace.find(img_path = path, db_path=verified_images, enforce_detection =False)[0]
+    recognition = recognition.sort_values('VGG-Face_cosine', ascending = False)
+    img_path = recognition.head(1).identity.values[0]
+    print(img_path)
+    print(recognition.identity)
+    print(recognition['VGG-Face_cosine'])
 
-    return recognition
+    recognized_person = Image.open(img_path)    
+
+    return recognized_person
 
